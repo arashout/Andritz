@@ -9,3 +9,6 @@ fast.
 If you need to look-up a material number, this script saves you a couple of clicks.
 Later on I will expand it out to other operations
 It basically uses a autohotkey in conjuction with VBS script to achieve this (Passing a parameter materialNum through the command line)
+##VBA
+This is the folder where I keep all the VBA modules I developed at Andritz.
+Most of them automate processes that users used to do manually -> Moving entries from Excel into SAP or vice versa
