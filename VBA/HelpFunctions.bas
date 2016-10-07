@@ -8,10 +8,13 @@ Function lastCol() As Long
 End Function
 Private Function popChar(index As Long, theString As String) As String
     'This function pops out the character at the given index
+    'IN integer index representing position of character you want, string for the string you want the characte from
+    'OUT string with single character
     popChar = Mid(theString, index, 1)
 End Function
 Public Sub FastWB(Optional ByVal opt As Boolean = True)
-    'Sub to make excel run faster
+    'From stackOverflow
+    'Set this to true when you want to turn off all unnecessary stuff for macros to run faster
     With Application
         .Calculation = IIf(opt, xlCalculationManual, xlCalculationAutomatic)
         .DisplayAlerts = Not opt
@@ -43,25 +46,35 @@ Private Sub EnableWS(ByVal ws As Worksheet, ByVal opt As Boolean)
     End With
 End Sub
 
-Sub IsEmptyRange()
-Dim cell As Range
-Dim bIsEmpty As Boolean
+Function IsEmptyRange(rangeObj As Range) As Boolean
+'Returns True if the given range only contains "" in cells
+'IN range object
+'OUT boolean representing whether range is empty or not
+    Dim cell As Range
+    
+    IsEmptyRange = True
+    For Each cell In rangeObj
+        If cell.Value <> "" Then
+            IsEmptyRange = False
+            Exit For
+        End If
+    Next cell
+    
+End Function
 
-bIsEmpty = True
-For Each cell In Range("BB2:BB5")
-    If cell.Value <> "" Then
-        bIsEmpty = False
-        Exit For
-    End If
-Next cell
+Function ColumnLetter(ColumnNumber As Long) As String
+'From StackOverflow
+'IN number corresponding to column
+'OUT column letter corresponding to given number
+    Dim n As Long
+    Dim c As Byte
+    Dim s As String
 
-If bIsEmpty = True Then
-    'There are empty cells in your range
-    '**PLACE CODE HERE**
-    MsgBox "All cells empty"
-Else
-    'There are NO empty cells in your range
-    '**PLACE CODE HERE**
-    MsgBox "Some have values"
-End If
-End Sub
+    n = ColumnNumber
+    Do
+        c = ((n - 1) Mod 26)
+        s = Chr(c + 65) & s
+        n = (n - c) \ 26
+    Loop While n > 0
+    ColumnLetter = s
+End Function
