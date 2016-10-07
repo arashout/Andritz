@@ -4,14 +4,14 @@ Function lastRow() As Long
 End Function
 
 Function lastCol() As Long
-'
     lastCol = Range("A1").SpecialCells(xlCellTypeLastCell).Column
 End Function
-
+Private Function popChar(index As Long, theString As String) As String
+    'This function pops out the character at the given index
+    popChar = Mid(theString, index, 1)
+End Function
 Public Sub FastWB(Optional ByVal opt As Boolean = True)
-    'VBA macro to turn off unnecessary futures during a macro
-    'Uses two private sub-routines to achieve this
-    'These macros aren't my work but from this thread: http://stackoverflow.com/questions/30959315/excel-vba-performance-1-million-rows-delete-rows-containing-a-value-in-less
+    'Sub to make excel run faster
     With Application
         .Calculation = IIf(opt, xlCalculationManual, xlCalculationAutomatic)
         .DisplayAlerts = Not opt
@@ -23,7 +23,7 @@ Public Sub FastWB(Optional ByVal opt As Boolean = True)
     FastWS , opt
 End Sub
 
-Private Sub FastWS(Optional ByVal ws As Worksheet = Nothing, _
+Public Sub FastWS(Optional ByVal ws As Worksheet = Nothing, _
                   Optional ByVal opt As Boolean = True)
     If ws Is Nothing Then
         For Each ws In Application.ActiveWorkbook.Sheets
@@ -43,3 +43,25 @@ Private Sub EnableWS(ByVal ws As Worksheet, ByVal opt As Boolean)
     End With
 End Sub
 
+Sub IsEmptyRange()
+Dim cell As Range
+Dim bIsEmpty As Boolean
+
+bIsEmpty = True
+For Each cell In Range("BB2:BB5")
+    If cell.Value <> "" Then
+        bIsEmpty = False
+        Exit For
+    End If
+Next cell
+
+If bIsEmpty = True Then
+    'There are empty cells in your range
+    '**PLACE CODE HERE**
+    MsgBox "All cells empty"
+Else
+    'There are NO empty cells in your range
+    '**PLACE CODE HERE**
+    MsgBox "Some have values"
+End If
+End Sub
