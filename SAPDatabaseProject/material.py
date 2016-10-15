@@ -1,6 +1,5 @@
 from csv import reader
 import pymysql
-import helper
 
 
 class Material(object):
@@ -10,6 +9,7 @@ class Material(object):
         '''
         self.mat_num = list_info[2]
         self.mat_type = list_info[3]
+        # mysql doesn't like single quotations, have to escape them
         self.desc = list_info[5].replace("'", "\\'")
         self.basic_mat = list_info[6]
         self.amc = list_info[9].replace(' ', '')
@@ -29,7 +29,7 @@ class Material(object):
     def db_insert(self, cursor):
         try:
             command = """
-            INSERT INTO sap_materials (
+            INSERT INTO andritz.sap_materials (
             mat_num,mat_type,description,basic_mat,amc
             )
             VALUES ('{0}','{1}','{2}','{3}','{4}')
@@ -44,7 +44,23 @@ class Material(object):
         except pymysql.err.ProgrammingError as e:
             print(e)
         except pymysql.err.IntegrityError as e:
-            print(e)
+            # If the entry already exists then update it
+            # Check if the error message contains key phrase
+            if "Duplicate entry" in e.args[1]:
+                command = """
+                UPDATE andritz.sap_materials
+                SET mat_type='{1}',description='{2}',basic_mat='{3}',amc='{4}'
+                WHERE mat_num='{0}';
+                """.format(
+                    self.mat_num,
+                    self.mat_type,
+                    self.desc,
+                    self.basic_mat,
+                    self.amc
+                ).replace('\n', '')
+                cursor.execute(command)
+            else:
+                print(e)
 
 
 def create_materials_from_SAP_file(file_path):
