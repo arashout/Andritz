@@ -10,7 +10,7 @@ class Material(object):
         '''
         self.mat_num = list_info[2]
         self.mat_type = list_info[3]
-        self.desc = list_info[5]
+        self.desc = list_info[5].replace("'", "\\'")
         self.basic_mat = list_info[6]
         self.amc = list_info[9].replace(' ', '')
 
@@ -42,10 +42,9 @@ class Material(object):
             ).replace('\n', '')
             cursor.execute(command)
         except pymysql.err.ProgrammingError as e:
-            print("Caught a Programming Error:")
             print(e)
         except pymysql.err.IntegrityError as e:
-            pass
+            print(e)
 
 
 def create_materials_from_SAP_file(file_path):
@@ -66,11 +65,11 @@ def create_materials_from_SAP_file(file_path):
 def setup_table(cursor):
     command = """
     CREATE TABLE IF NOT EXISTS sap_materials(
-    mat_num char(9) NOT NULL,
-    mat_type char(4) NOT NULL,
-    description text,
-    basic_mat varchar(255),
-    amc char(11),
+    mat_num CHAR(9) NOT NULL,
+    mat_type CHAR(4) NOT NULL,
+    description BLOB,
+    basic_mat VARCHAR(255),
+    amc CHAR(11),
     PRIMARY KEY (mat_num)
     )
     """.replace('\n', '')
