@@ -3,16 +3,16 @@ import pymysql
 
 
 class Material(object):
-    def __init__(self, list_info):
+    def __init__(self, mat_num, mat_type="", desc="", basic_mat="", amc=""):
         '''
         Assuming that list_info is fed from parse_SAP_export
         '''
-        self.mat_num = list_info[2]
-        self.mat_type = list_info[3]
+        self.mat_num = mat_num
+        self.mat_type = mat_type
         # mysql doesn't like single quotations, have to escape them
-        self.desc = list_info[5].replace("'", "\\'")
-        self.basic_mat = list_info[6]
-        self.amc = list_info[9].replace(' ', '')
+        self.desc = desc
+        self.basic_mat = basic_mat
+        self.amc = amc
 
     def __str__(self):
         string_rep = """
@@ -68,12 +68,19 @@ def create_materials_from_SAP_file(file_path):
     count = 0
     with open(file_path, 'r') as f:
         # CSV module doing most of the heavy lifting here
-        for line in reader(f):
+        for row_info in reader(f):
             # Skip the header
             if count == 0:
                 pass
             else:
-                list_obj.append(Material(line))
+                mat_num = row_info[2]
+                mat_type = row_info[3]
+                # mysql doesn't like single quotations, have to escape them
+                desc = row_info[5].replace("'", "\\'")
+                basic_mat = row_info[6]
+                amc = row_info[9].replace(' ', '')
+                list_obj.append(
+                    Material(mat_num, mat_type, desc, basic_mat, amc))
             count = + 1
     return list_obj
 
