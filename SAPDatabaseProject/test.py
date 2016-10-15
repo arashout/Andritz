@@ -11,9 +11,11 @@ conn = pymysql.connect(host='localhost', port=3306,
                        user='root', passwd='root', db='mysql')
 cur = conn.cursor()
 
-cur.execute("USE andritz;")
+cur.execute('SET NAMES utf8mb4;')
+cur.execute('SET CHARACTER SET utf8mb4;')
+cur.execute('SET character_set_connection=utf8mb4;')
 
-# material.setup_table(cur)
+cur.execute("USE andritz;")
 
 for mat in list_material_objects:
     mat.db_insert(cur)

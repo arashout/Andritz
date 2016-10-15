@@ -1,5 +1,7 @@
 from csv import reader
 import pymysql
+import helper
+
 
 class Material(object):
     def __init__(self, list_info):
@@ -43,8 +45,7 @@ class Material(object):
             print("Caught a Programming Error:")
             print(e)
         except pymysql.err.IntegrityError as e:
-            print("Caught a Integrity Error:")
-            print(e)
+            pass
 
 
 def create_materials_from_SAP_file(file_path):
