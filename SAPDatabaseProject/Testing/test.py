@@ -3,8 +3,8 @@ import pymysql
 import unittest
 
 
-class CreateTableTestCase(unittest.TestCase):
-
+class BaseTestCase(unittest.TestCase):
+    @classmethod
     def setUp(self):
         '''
         Establish connections and create the test table
@@ -25,8 +25,18 @@ class CreateTableTestCase(unittest.TestCase):
         """.replace('\n', '')
         success = self.cur.execute(command)
         # If command hits an error, cursor returns value == E
-        assert(success == 0)
+        self.assertTrue(success == 0, "mysql error")
 
+    @classmethod
+    def tearDown(self):
+        '''
+        Method to delete test table and close all connections
+        '''
+        self.cur.execute("USE andritz")
+        self.cur.execute("DROP TABLE test_sap_materials")
+
+
+class TableCreationTestCase(BaseTestCase):
     def test_table_exists(self):
         '''
         Check if the table exists
@@ -40,14 +50,7 @@ class CreateTableTestCase(unittest.TestCase):
         """
         self.cur.execute(command)
 
-        assert(self.cur.fetchone() is not None)
-
-    def tearDown(self):
-        '''
-        Method to delete test table and close all connections
-        '''
-        self.cur.execute("USE andritz")
-        self.cur.execute("DROP TABLE test_sap_materials")
+        self.assertIsNotNone(self.cur.fetchone())
 
 
 if __name__ == '__main__':
