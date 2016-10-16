@@ -9,9 +9,10 @@ class Material(object):
         '''
         self.mat_num = mat_num
         self.mat_type = mat_type
-        self.desc = desc
+        # mysql doesn't like single quotations, have to escape them
+        self.desc = desc.replace("'", "\\'")
         self.basic_mat = basic_mat
-        self.amc = amc
+        self.amc = amc.replace(' ', '')
 
     def __str__(self):
         string_rep = """
@@ -83,10 +84,9 @@ def create_materials_from_SAP_file(file_path):
             else:
                 mat_num = row_info[2]
                 mat_type = row_info[3]
-                # mysql doesn't like single quotations, have to escape them
-                desc = row_info[5].replace("'", "\\'")
+                desc = row_info[5]
                 basic_mat = row_info[6]
-                amc = row_info[9].replace(' ', '')
+                amc = row_info[9]
                 list_obj.append(
                     Material(mat_num, mat_type, desc, basic_mat, amc))
             count = + 1
