@@ -6,6 +6,33 @@ End Function
 Function lastCol() As Long
     lastCol = Range("A1").SpecialCells(xlCellTypeLastCell).Column
 End Function
+Public Function GetMaxCell(Optional ByRef rng As Range = Nothing) As Range
+
+    'Returns the last cell containing a value, or A1 if Worksheet is empty
+
+    Const NONEMPTY As String = "*"
+    Dim lRow As Range, lCol As Range
+
+    If rng Is Nothing Then Set rng = Application.ActiveWorkbook.ActiveSheet.UsedRange
+    If WorksheetFunction.CountA(rng) = 0 Then
+        Set GetMaxCell = rng.Parent.Cells(1, 1)
+    Else
+        With rng
+            Set lRow = .Cells.Find(What:=NONEMPTY, LookIn:=xlFormulas, _
+                                        After:=.Cells(1, 1), _
+                                        SearchDirection:=xlPrevious, _
+                                        SearchOrder:=xlByRows)
+            If Not lRow Is Nothing Then
+                Set lCol = .Cells.Find(What:=NONEMPTY, LookIn:=xlFormulas, _
+                                            After:=.Cells(1, 1), _
+                                            SearchDirection:=xlPrevious, _
+                                            SearchOrder:=xlByColumns)
+
+                Set GetMaxCell = .Parent.Cells(lRow.Row, lCol.Column)
+            End If
+        End With
+    End If
+End Function
 Private Function popChar(index As Long, theString As String) As String
     'This function pops out the character at the given index
     'IN integer index representing position of character you want, string for the string you want the characte from
@@ -78,3 +105,13 @@ Function ColumnLetter(ColumnNumber As Long) As String
     Loop While n > 0
     ColumnLetter = s
 End Function
+
+ Function SheetExists(shtName As String, Optional wb As Workbook) As Boolean
+    Dim sht As Worksheet
+
+     If wb Is Nothing Then Set wb = ActiveWorkbook
+     On Error Resume Next
+     Set sht = wb.Sheets(shtName)
+     On Error GoTo 0
+     SheetExists = Not sht Is Nothing
+ End Function
