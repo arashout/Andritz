@@ -5,11 +5,10 @@ import pymysql
 class Material(object):
     def __init__(self, mat_num, mat_type="", desc="", basic_mat="", amc=""):
         '''
-        Assuming that list_info is fed from parse_SAP_export
+        Simple constructor
         '''
         self.mat_num = mat_num
         self.mat_type = mat_type
-        # mysql doesn't like single quotations, have to escape them
         self.desc = desc
         self.basic_mat = basic_mat
         self.amc = amc
@@ -27,6 +26,11 @@ class Material(object):
         return string_rep
 
     def db_insert(self, cursor):
+        '''
+        Tries to insert the object into sql given a cursor object
+        If a natural key (material number) already exists it updates
+        the material
+        '''
         try:
             command = """
             INSERT INTO andritz.sap_materials (
@@ -64,6 +68,10 @@ class Material(object):
 
 
 def create_materials_from_SAP_file(file_path):
+    '''
+    Given a file path to a csv export file from SAP it
+    reads the important information and returns a list of SAP material objects
+    '''
     list_obj = []
     count = 0
     with open(file_path, 'r') as f:
@@ -86,6 +94,9 @@ def create_materials_from_SAP_file(file_path):
 
 
 def setup_table(cursor):
+    '''
+    A command that setups the sap_materials table if it doesn't exist
+    '''
     command = """
     CREATE TABLE IF NOT EXISTS andritz.sap_materials(
     mat_num CHAR(9) NOT NULL,
