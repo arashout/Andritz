@@ -87,7 +87,7 @@ def create_materials_from_SAP_file(file_path):
 
 def setup_table(cursor):
     command = """
-    CREATE TABLE IF NOT EXISTS sap_materials(
+    CREATE TABLE IF NOT EXISTS andritz.sap_materials(
     mat_num CHAR(9) NOT NULL,
     mat_type CHAR(4) NOT NULL,
     description BLOB,

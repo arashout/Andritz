@@ -8,11 +8,10 @@ list_material_objects = material.create_materials_from_SAP_file(file_path)
 
 
 conn = pymysql.connect(host='localhost', port=3306,
-                       user='root', passwd='root', db='mysql',
+                       user='arash', passwd='main', db='andritz',
                        use_unicode=True, charset="utf8")
 cur = conn.cursor()
 
-cur.execute("USE andritz;")
 material.setup_table(cur)
 
 for mat in list_material_objects:
