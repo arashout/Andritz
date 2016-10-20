@@ -4,7 +4,35 @@ Function lastRow() As Long
 End Function
 
 Function lastCol() As Long
-    lastCol = Range("A1").SpecialCells(xlCellTypeLastCell).Column
+    lastCol = Cells(1, Columns.Count).End(xlToLeft).Column
+End Function
+Public Sub hideColumnsBasedOnRow(ByRef strArr As Variant, Optional rowIndex As Long = 1, Optional delete As Boolean = False)
+    Dim colI As Long: colI = 1
+    Dim element As Variant
+    Dim insideFlag As Boolean: insideFlag = False
+    Dim lastColumn As Long: lastColumn = lastCol()
+    While colI <= lastColumn
+        If Not inArr(strArr, Cells(rowIndex, colI).Value) Then
+            If delete Then
+                Columns(colI).EntireColumn.delete
+            Else
+                v.EntireColumn.Hidden = True
+            End If
+        End If
+        colI = colI + 1
+    Wend
+    
+End Sub
+Function inArr(ByRef arr As Variant, ByVal searchString As Variant) As Boolean
+    Dim flag As Boolean: flag = False
+    Dim element As Variant
+    
+    For Each element In arr
+        If element = searchString Then
+            flag = True
+        End If
+    Next element
+    inArr = flag
 End Function
 Public Function GetMaxCell(Optional ByRef rng As Range = Nothing) As Range
 
@@ -33,7 +61,7 @@ Public Function GetMaxCell(Optional ByRef rng As Range = Nothing) As Range
         End With
     End If
 End Function
-Private Function popChar(index As Long, theString As String) As String
+Public Function popChar(index As Long, theString As String) As String
     'This function pops out the character at the given index
     'IN integer index representing position of character you want, string for the string you want the characte from
     'OUT string with single character
