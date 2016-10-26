@@ -1,4 +1,5 @@
 Attribute VB_Name = "PullPrices4Mat"
+
 Public Type Material
     'Info about material
      matNum As String
@@ -21,6 +22,7 @@ End Type
 Public Function GetBlankMaterial() As Material
 End Function
 Sub findPrice()
+    Dim cellRange As Range
     'Get the range the user has selected to determine the first and last cell to iterate between
     Dim myRange As Range
     Set myRange = Selection
@@ -32,8 +34,7 @@ Sub findPrice()
     Set session = SAPFunctions.connect2SAP()
     
     Dim k As Long 'Column index where to look for SAP numbers, also used to determine
-    'k = CInt(InputBox("Enter a number that represents the column with SAP numbers e.g A = 1. Also note that the next 3 columns need to be free."))
-    k = 1
+    k = CInt(InputBox("Enter a number that represents the column with SAP numbers e.g A = 1. Also note that a 4 cells will be inserted adjacent the selection"))
     Dim curMat As Material
     For j = startJ To lastJ
         curMat = GetBlankMaterial() 'Clear curMat for next material
@@ -67,7 +68,14 @@ Sub findPrice()
             Loop
         End If
         
+        
         If curMat.found Then 'If price found then output to excel columns
+            Set cellRange = Range(Cells(j, k + 1).Address)
+            cellRange.Select
+            Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+            Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+            Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+            Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
             Cells(j, k + 1) = curMat.price
             Cells(j, k + 2) = curMat.currency
             Cells(j, k + 3) = curMat.quantity
@@ -75,13 +83,14 @@ Sub findPrice()
             Cells(j, k + 4) = curMat.plant
         End If
     Next j
+    
+    session.findById("wnd[0]").Close
 End Sub
 
 Private Sub navigateToMD04(ByRef mat As Material)
     Dim session As Variant
     Set session = mat.session
     
-    session.findById("wnd[0]").maximize
     session.findById("wnd[0]/tbar[0]/okcd").Text = "/nmd04"
     session.findById("wnd[0]").sendVKey 0
     session.findById("wnd[0]/usr/tabsTAB300/tabpF01/ssubINCLUDE300:SAPMM61R:0301/ctxtRM61R-MATNR").Text = mat.matNum 'Enter a Material Number
