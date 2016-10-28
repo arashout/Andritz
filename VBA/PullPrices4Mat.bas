@@ -27,14 +27,17 @@ Sub findPrice()
     Dim myRange As Range
     Set myRange = Selection
     
+    
     Dim startJ As Long: startJ = myRange.Row 'Get the first row of the selection
     Dim lastJ As Long: lastJ = myRange.Rows.count + startJ - 1 'Get the last row of the selection
     
-    'Connect to SAP
-    Set session = SAPFunctions.connect2SAP()
+    Dim k As Long 'Column index where to look for SAP numbers
+    k = myRange.Column 'First column of selection
     
-    Dim k As Long 'Column index where to look for SAP numbers, also used to determine
-    k = CInt(InputBox("Enter a number that represents the column with SAP numbers e.g A = 1. Also note that a 4 cells will be inserted adjacent the selection"))
+    'Connect to SAP
+    Set session = SAPFunctions.connect2SAPNew()
+    
+    
     Dim curMat As Material
     For j = startJ To lastJ
         curMat = GetBlankMaterial() 'Clear curMat for next material

@@ -26,7 +26,7 @@ Sub GetRouting()
     Set SAPCon = SAPApp.Children(0)             ' Get the first system that is currently connected
 
     Dim OriginalChildren As Integer
-    OriginalChildren = SAPCon.Children.Count
+    OriginalChildren = SAPCon.Children.count
     
     Set session = SAPCon.Children(0)            ' Get the first session (window) on that connection
     
@@ -207,7 +207,7 @@ Function ReadLongText(OpNum, View)
     Set SAPCon = SAPApp.Children(0)             ' Get the first system that is currently connected
 
     Dim OriginalChildren As Integer
-    OriginalChildren = SAPCon.Children.Count
+    OriginalChildren = SAPCon.Children.count
     
     Set session = SAPCon.Children(0)            ' Get the first session (window) on that connection
     
@@ -225,9 +225,9 @@ Function ReadLongText(OpNum, View)
     End If
     
     'Initialize some valeus for the first run through the while loop
-    Count = 1
-    SearchString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/txtRSTXT-TXLINE[2," & Count & "]"
-    ParaString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/ctxtRSTXT-TXPARGRAPH[0," & Count & "]"
+    count = 1
+    SearchString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/txtRSTXT-TXLINE[2," & count & "]"
+    ParaString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/ctxtRSTXT-TXPARGRAPH[0," & count & "]"
     ParaVar = session.findById(ParaString).Text
     longText = session.findById(SearchString).Text
     
@@ -240,9 +240,9 @@ Function ReadLongText(OpNum, View)
         End If
                 
         'Get new values
-        Count = Count + 1
-        SearchString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/txtRSTXT-TXLINE[2," & Count & "]"
-        ParaString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/ctxtRSTXT-TXPARGRAPH[0," & Count & "]"
+        count = count + 1
+        SearchString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/txtRSTXT-TXLINE[2," & count & "]"
+        ParaString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/ctxtRSTXT-TXPARGRAPH[0," & count & "]"
         ParaVar = session.findById(ParaString).Text
         longText = session.findById(SearchString).Text
     Wend

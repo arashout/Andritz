@@ -4,7 +4,14 @@ Function lastRow() As Long
 End Function
 
 Function lastCol() As Long
-    lastCol = Cells(1, Columns.Count).End(xlToLeft).Column
+    lastCol = Cells(1, Columns.count).End(xlToLeft).Column
+End Function
+Public Function LastAuthor() As String
+   Application.Volatile
+   LastAuthor = ThisWorkbook.BuiltinDocumentProperties("Last Author")
+End Function
+Public Function getUser() As String
+    Environ ("Username")
 End Function
 Public Sub hideColumnsBasedOnRow(ByRef strArr As Variant, Optional rowIndex As Long = 1, Optional delete As Boolean = False)
     Dim colI As Long: colI = 1
