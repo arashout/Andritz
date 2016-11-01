@@ -1,4 +1,4 @@
-Attribute VB_Name = "Derek"
+Attribute VB_Name = "IndividualCOOIS"
 Sub jobCOOIS()
     Dim user_input As String
     Dim choice As Integer
@@ -10,7 +10,7 @@ Sub jobCOOIS()
     If IsNumeric(user_input) And Len(user_input) = 8 Then
         choice = 1
     'User input is wbs element
-    ElseIf Len(user_input) = 15 Then
+    ElseIf Len(user_input) = 15 Or Len(user_input) = 20 Then
         choice = 2
     'User pressed cancel or entered nothing
     ElseIf Len(user_input) = 0 Then
@@ -21,7 +21,7 @@ Sub jobCOOIS()
     End If
     
     Dim session
-    Set session = SAPFunctions.connect2SAP()
+    Set session = SAPFunctions.connect2SAPNew()
     session.findById("wnd[0]/tbar[0]/okcd").Text = "/nCOOIS"
     session.findById("wnd[0]").sendVKey 0
     session.findById("wnd[0]/usr/ssub%_SUBSCREEN_TOPBLOCK:PPIO_ENTRY:1100/cmbPPIO_ENTRY_SC1100-PPIO_LISTTYP").Key = "PPIOO000"
