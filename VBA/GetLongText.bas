@@ -10,7 +10,7 @@ Sub getLongText()
     
     'Connect to SAP
     Dim session
-    Set session = SAPFunctions.connect2SAP()
+    Set session = SAPFunctions.connect2SAPNew()
     
     'Declare variables to use
     Dim matNum, i As Long
@@ -31,21 +31,26 @@ Sub getLongText()
     For i = startI To lastI 'Start at active cell location
         If VarType(Cells(i, matNumCol).Value) = vbDouble Then
             matNum = Cells(i, matNumCol)
-            session.findById("wnd[0]/tbar[0]/okcd").Text = "/nmm03"
-            session.findById("wnd[0]").sendVKey 0
+            session.SendCommand ("/nmm03")
             session.findById("wnd[0]/usr/ctxtRMMG1-MATNR").Text = matNum
+            session.findById("wnd[0]").sendVKey 0
+            
             'If any errors pop-up - log them then move on
             If session.findById("wnd[0]/sbar").messagetype = "E" Then
                     'Escape out of the error message
-                    session.findById("wnd[0]/usr/tabsTS_ITOV/tabpTCMA/ssubSUBPAGE:SAPLCSDI:0152/tblSAPLCSDITCMAT/txtRC29P-POSNR[0," & j & "]").SetFocus
-                    session.findById("wnd[0]").sendVKey 12 'Press Escape
+                    'session.findById("wnd[0]/usr/tabsTS_ITOV/tabpTCMA/ssubSUBPAGE:SAPLCSDI:0152/tblSAPLCSDITCMAT/txtRC29P-POSNR[0," & j & "]").SetFocus
+                    'session.findById("wnd[0]").sendVKey 12 'Press Escape
                     'Log it
                     Cells(i, matNumCol).Interior.ColorIndex = 3 'Color Row RED
+            Else
+                session.findById("wnd[1]/tbar[0]/btn[19]").press
+                session.findById("wnd[1]/usr/tblSAPLMGMMTC_VIEW").getAbsoluteRow(0).Selected = True
+                session.findById("wnd[1]").sendVKey 0
+                longText = session.findById("wnd[0]/usr/tabsTABSPR1/tabpSP01/ssubTABFRA1:SAPLMGMM:2005/subSUB3:SAPLZMM00_ASTMGD1:2002/txtZRAST-TEXTAST").Text
+                Cells(i, descCol).Value = longText
             End If
-            session.findById("wnd[0]").sendVKey 0
-            session.findById("wnd[1]").sendVKey 0
-            longText = session.findById("wnd[0]/usr/tabsTABSPR1/tabpSP01/ssubTABFRA1:SAPLMGMM:2005/subSUB3:SAPLZMM00_ASTMGD1:2002/txtZRAST-TEXTAST").Text
-            Cells(i, descCol).Value = longText
+            
+
         Else
         End If
         
