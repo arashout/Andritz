@@ -26,10 +26,10 @@ Sub AttachCerts()
                 curPONum = ""
                 curPONum = returnPONumber(fullFilePath)
     
-                session.findById("wnd[0]/tbar[0]/okcd").Text = "/nme22n"
+                session.findById("wnd[0]/tbar[0]/okcd").text = "/nme22n"
                 session.findById("wnd[0]").sendVKey 0
                 session.findById("wnd[0]/tbar[1]/btn[17]").press
-                session.findById("wnd[1]/usr/subSUB0:SAPLMEGUI:0003/ctxtMEPO_SELECT-EBELN").Text = curPONum
+                session.findById("wnd[1]/usr/subSUB0:SAPLMEGUI:0003/ctxtMEPO_SELECT-EBELN").text = curPONum
                 session.findById("wnd[1]").sendVKey 0
                 
                 If session.Children().count = 2 Then
@@ -38,10 +38,10 @@ Sub AttachCerts()
                     If errorText = "" Then
                         session.findById("wnd[0]/titl/shellcont/shell").pressContextButton "%GOS_TOOLBOX"
                         session.findById("wnd[0]/titl/shellcont/shell").selectContextMenuItem "%GOS_PCATTA_CREA"
-                        session.findById("wnd[1]/usr/ctxtDY_PATH").Text = directoryPath
-                        session.findById("wnd[1]/usr/ctxtDY_FILENAME").Text = fileObj.Name
+                        session.findById("wnd[1]/usr/ctxtDY_PATH").text = directoryPath
+                        session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = fileObj.Name
                         session.findById("wnd[1]/tbar[0]/btn[0]").press
-                        NewFile.WriteLine (fileObj.Name & " | " & session.findById("wnd[0]/sbar").Text) 'Success
+                        NewFile.WriteLine (fileObj.Name & " | " & session.findById("wnd[0]/sbar").text) 'Success
                     Else
                         NewFile.WriteLine (fileObj.Name & " | " & "No PO") 'Error
                     End If

@@ -32,7 +32,6 @@ while j < len(anchors) - 1:
     lines = []
     for k in range(anchors[j].line_index, anchors[j + 1].line_index):
         lines.append(content[k])
-
     anchors[j].add_text_snippet(lines)
     j += 1
 

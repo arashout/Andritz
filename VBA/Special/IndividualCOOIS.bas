@@ -22,22 +22,22 @@ Sub jobCOOIS()
     
     Dim session
     Set session = SAPFunctions.connect2SAPNew()
-    session.findById("wnd[0]/tbar[0]/okcd").Text = "/nCOOIS"
+    session.findById("wnd[0]/tbar[0]/okcd").text = "/nCOOIS"
     session.findById("wnd[0]").sendVKey 0
     session.findById("wnd[0]/usr/ssub%_SUBSCREEN_TOPBLOCK:PPIO_ENTRY:1100/cmbPPIO_ENTRY_SC1100-PPIO_LISTTYP").Key = "PPIOO000"
-    session.findById("wnd[0]/usr/ssub%_SUBSCREEN_TOPBLOCK:PPIO_ENTRY:1100/ctxtPPIO_ENTRY_SC1100-ALV_VARIANT").Text = "/DELTA OPS"
+    session.findById("wnd[0]/usr/ssub%_SUBSCREEN_TOPBLOCK:PPIO_ENTRY:1100/ctxtPPIO_ENTRY_SC1100-ALV_VARIANT").text = "/DELTA OPS"
     
     'Leaving possibility for other choices later on
     If choice = 1 Then
-        session.findById("wnd[0]/usr/tabsTABSTRIP_SELBLOCK/tabpSEL_00/ssub%_SUBSCREEN_SELBLOCK:PPIO_ENTRY:1200/ctxtS_AUFNR-LOW").Text = user_input
+        session.findById("wnd[0]/usr/tabsTABSTRIP_SELBLOCK/tabpSEL_00/ssub%_SUBSCREEN_SELBLOCK:PPIO_ENTRY:1200/ctxtS_AUFNR-LOW").text = user_input
     Else
-        session.findById("wnd[0]/usr/tabsTABSTRIP_SELBLOCK/tabpSEL_00/ssub%_SUBSCREEN_SELBLOCK:PPIO_ENTRY:1200/ctxtS_PROJN-LOW").Text = user_input
+        session.findById("wnd[0]/usr/tabsTABSTRIP_SELBLOCK/tabpSEL_00/ssub%_SUBSCREEN_SELBLOCK:PPIO_ENTRY:1200/ctxtS_PROJN-LOW").text = user_input
     End If
     
     session.findById("wnd[0]/tbar[1]/btn[8]").press
     
     On Error GoTo NoMessageBox
-    If InStr(session.findById("wnd[1]/usr/txtMESSTXT1").Text, "There is no data for the selection") Then
+    If InStr(session.findById("wnd[1]/usr/txtMESSTXT1").text, "There is no data for the selection") Then
         session.findById("wnd[0]").Close
         MsgBox ("(SAP says) There is no data for the selection. Double-Check your entry")
         Exit Sub
@@ -50,7 +50,7 @@ NoMessageBox:
     session.findById("wnd[0]/usr/cntlCUSTOM/shellcont/shell/shellcont/shell").selectContextMenuItem "&XXL"
     session.findById("wnd[1]/tbar[0]/btn[0]").press
     'Name the file
-    session.findById("wnd[1]/usr/ctxtDY_FILENAME").Text = user_input & "_COOIS.xlsx"
+    session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = user_input & "_COOIS.xlsx"
     
     session.findById("wnd[1]").sendVKey 0
     

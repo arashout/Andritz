@@ -1,10 +1,18 @@
 Attribute VB_Name = "HelpFunctions"
+Function removeFirstElement(ByVal arr As Variant) As Variant
+    For i = LBound(arr) + 1 To UBound(arr)
+      arr(i - 1) = arr(i)
+    Next i
+    ReDim Preserve arr(UBound(arr) - 1)
+    removeFirstElement = arr
+End Function
+
 Function lastRow() As Long
     lastRow = Range("A1").SpecialCells(xlCellTypeLastCell).Row
 End Function
 
 Function lastCol() As Long
-    lastCol = Cells(1, Columns.count).End(xlToLeft).Column
+    lastCol = Cells(1, Columns.Count).End(xlToLeft).Column
 End Function
 Public Function LastAuthor() As String
    Application.Volatile

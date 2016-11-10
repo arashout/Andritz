@@ -33,16 +33,16 @@ Sub GetRouting()
     'Navigate to Routing
     'Step 1 - Navigate to Correct Transaction
     session.findById("wnd[0]").maximize 'Maximize the SAP window - Although I don't know if this is strictly necessary
-    session.findById("wnd[0]/tbar[0]/okcd").Text = "/nCA03" 'Type "/nCA03" in command field
+    session.findById("wnd[0]/tbar[0]/okcd").text = "/nCA03" 'Type "/nCA03" in command field
     session.findById("wnd[0]").sendVKey 0 'Press the enter key
     
     'Navigate to Routing
     'Step 2 - Navigate to Correct Material Number Routing
-    session.findById("wnd[0]/usr/ctxtRC27M-MATNR").Text = materialNum   'Enter MaterialNumber
-    session.findById("wnd[0]/usr/ctxtRC27M-WERKS").Text = "1105"        'Enter Plant Number
-    session.findById("wnd[0]/usr/ctxtRC271-STTAG").Text = "01/01/2012"  'Enter Key Date
+    session.findById("wnd[0]/usr/ctxtRC27M-MATNR").text = materialNum   'Enter MaterialNumber
+    session.findById("wnd[0]/usr/ctxtRC27M-WERKS").text = "1105"        'Enter Plant Number
+    session.findById("wnd[0]/usr/ctxtRC271-STTAG").text = "01/01/2012"  'Enter Key Date
     session.findById("wnd[0]/tbar[1]/btn[7]").press                     'Navigate to list of routing
-    RoutingCount = session.findById("wnd[0]/usr/txtRC27X-ENTRIES").Text 'Get total number of routings
+    RoutingCount = session.findById("wnd[0]/usr/txtRC27X-ENTRIES").text 'Get total number of routings
     
     'IMPORTANT:
     'If more than one routing, must prompt user to select the correct routing
@@ -52,42 +52,42 @@ Sub GetRouting()
         
     'Nav to Sequences - Count # of Seq - Get Title and Number of Sequence
     session.findById("wnd[0]/tbar[1]/btn[6]").press                         'Navigate to Sequences
-    SequenceCount = session.findById("wnd[0]/usr/txtRC27X-ENTRIES").Text    'Get total number of sequences
+    SequenceCount = session.findById("wnd[0]/usr/txtRC27X-ENTRIES").text    'Get total number of sequences
     Dim SequenceSpace() As Integer                                          'Create a variable to hold the row number of every sequence entry in spreadsheet
     ReDim SequenceSpace(SequenceCount - 1)                                  'Resize SequenceSpace variable
         
     'Navigate to operations in standard sequence and get title of routing from operation 1
     session.findById("wnd[0]/tbar[1]/btn[7]").press                                             'Navigate to operations in standard sequence
-    TitleText = session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/txtPLPOD-LTXA1[6,0]").Text   'Get Title of Routing from Op 1 - assign to TitleText variable
+    TitleText = session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/txtPLPOD-LTXA1[6,0]").text   'Get Title of Routing from Op 1 - assign to TitleText variable
     Call SetUpWorkbook(TitleText, materialNum)                                                  'Run SetUpWorkBook sequence, pass material number and TitleText as variable, return name of workbook
     session.findById("wnd[0]/tbar[1]/btn[29]").press                                            'Navigate back to list of sequences
     
-    A = 3 'List the row of the current sequence description in excel spreadsheet
+    a = 3 'List the row of the current sequence description in excel spreadsheet
     
     'These nested loops do most of the important work
     'The outer loop pulls the sequence name and number and puts this in a row
     'The inner loop pulls the operation hours, description, and other info and puts them in a row
     For j = 0 To SequenceCount - 1
-        SequenceSpace(j) = A 'Input the row of the current sequence into the SequenceSpace variable
+        SequenceSpace(j) = a 'Input the row of the current sequence into the SequenceSpace variable
         
         'Get Sequence Name and Number from SAP
         'Put SAP addresses in strings
         StringSeqNum = "wnd[0]/usr/tblSAPLCPDITCTRL_1300/txtPLFLD-PLNFL[0," & j & "]"   'Sequence Number String address
         StringSeqDesc = "wnd[0]/usr/tblSAPLCPDITCTRL_1300/txtPLFLD-LTXA1[7," & j & "]"  'Sequence Description address
         'Pull Name and Number from SAP using addresses from above
-        SeqNum = session.findById(StringSeqNum).Text    'Pull Sequence Number
-        SeqDesc = session.findById(StringSeqDesc).Text  'Pull Sequence Description
+        SeqNum = session.findById(StringSeqNum).text    'Pull Sequence Number
+        SeqDesc = session.findById(StringSeqDesc).text  'Pull Sequence Description
         
         'Format cells and input sequence name and number
-        Range(Cells(A, 2), Cells(A, 4)).Merge                               'Merge cells for sequence description
-        Cells(A, 2).Value = SeqNum & "/ " & SeqDesc                         'Put sequence name and number in sequence description rows
-        Range(Cells(A, 2), Cells(A, 6)).Interior.Color = RGB(204, 192, 218) 'Set background colour of sequence cells
-        Range(Cells(A, 2), Cells(A, 6)).Font.Bold = True                    'Bold sequence text
+        Range(Cells(a, 2), Cells(a, 4)).Merge                               'Merge cells for sequence description
+        Cells(a, 2).Value = SeqNum & "/ " & SeqDesc                         'Put sequence name and number in sequence description rows
+        Range(Cells(a, 2), Cells(a, 6)).Interior.Color = RGB(204, 192, 218) 'Set background colour of sequence cells
+        Range(Cells(a, 2), Cells(a, 6)).Font.Bold = True                    'Bold sequence text
         
         'Prepare to pull operation information
         session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1300").getAbsoluteRow(j).Selected = True  'Select current sequence in SAP
         session.findById("wnd[0]/tbar[1]/btn[7]").press                                         'Navigate to list of operations in SAP
-        LastEntry = session.findById("wnd[0]/usr/txtRC27X-ENTRIES").Text                        'Determine number of operation in sequence and assign to variable LastEntry
+        LastEntry = session.findById("wnd[0]/usr/txtRC27X-ENTRIES").text                        'Determine number of operation in sequence and assign to variable LastEntry
         
         'Pull operation info from SAP
         For i = 0 To LastEntry - 1
@@ -103,34 +103,34 @@ Sub GetRouting()
             'Start by checking for long text
             'If no long text exists, use short text
             If session.findById(StringLongText).Selected = True Then    'Check if Long Text exists
-                Desc = ReadLongText(i, View)                                  'Use a function to pull long text if long text exists
+                desc = ReadLongText(i, View)                                  'Use a function to pull long text if long text exists
             Else
-                Desc = session.findById(StringDesc).Text                'Use short text if long text does not exist
+                desc = session.findById(StringDesc).text                'Use short text if long text does not exist
             End If
             
             'Pull remaining operation info
-            Op = session.findById(StringOp).Text    'Pull Operation Number
-            WC = session.findById(StringWC).Text    'Pull Work Centre
-            Hr = session.findById(StringHr).Text    'Pull Hours
+            Op = session.findById(StringOp).text    'Pull Operation Number
+            WC = session.findById(StringWC).text    'Pull Work Centre
+            Hr = session.findById(StringHr).text    'Pull Hours
             
             'Put all operation info in excel (in appropriate column)
-            Cells(A + 1 + i, 4).Value = Desc
-            Cells(A + 1 + i, 5).Value = Hr
-            Cells(A + 1 + i, 6).Value = WC
-            Cells(A + 1 + i, 3).Value = Op
+            Cells(a + 1 + i, 4).Value = desc
+            Cells(a + 1 + i, 5).Value = Hr
+            Cells(a + 1 + i, 6).Value = WC
+            Cells(a + 1 + i, 3).Value = Op
             
             'Format the cells
-            Cells(A + 1 + i, 4).WrapText = True 'Wrap Text
-            Rows(A + 1 + i).AutoFit 'Autfit row height
+            Cells(a + 1 + i, 4).WrapText = True 'Wrap Text
+            Rows(a + 1 + i).AutoFit 'Autfit row height
             
         Next i 'Move onto next operation
         
         'Sum hours for the current sequence in the sequence row
-        Cells(A, 5).Formula = "=SUM(" & Range(Cells(A + 1, 5), Cells(A + LastEntry, 5)).Address(False, False) & ")" 'Input formula into cell
-        Cells(A, 5).NumberFormat = "#.##"" hrs""" 'Format hours cell to include some text at the end of the number " hrs"
+        Cells(a, 5).Formula = "=SUM(" & Range(Cells(a + 1, 5), Cells(a + LastEntry, 5)).Address(False, False) & ")" 'Input formula into cell
+        Cells(a, 5).NumberFormat = "#.##"" hrs""" 'Format hours cell to include some text at the end of the number " hrs"
         
         'Prepare for next sequence
-        A = A + LastEntry + 1                                                                   'Assign new value for new sequence row
+        a = a + LastEntry + 1                                                                   'Assign new value for new sequence row
         session.findById("wnd[0]/tbar[1]/btn[29]").press                                        'Navigate back to list of sequences in SAP
         session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1300").getAbsoluteRow(j).Selected = False 'Deselect current seq
     Next j
@@ -192,7 +192,7 @@ Function ReadLongText(OpNum, View)
     Dim ParaVar As String       'Holds information regarding formatting of long text for current line (whether you skip a line and such, more info available in SAP)
     Dim longText As String      'Holds long text for current line
     Dim LongTextOut As String   'Holds long text for entire document - includes info about whether or not to skip a line and such (ParaVar)
-    Dim SearchString As String  'Holds address of LongText (in SAP)
+    Dim searchString As String  'Holds address of LongText (in SAP)
     Dim ParaString As String    'Holds address of Paragraph info (in SAP)
     
     'This code work by starting from the top and working until there is no more text.
@@ -226,10 +226,10 @@ Function ReadLongText(OpNum, View)
     
     'Initialize some valeus for the first run through the while loop
     count = 1
-    SearchString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/txtRSTXT-TXLINE[2," & count & "]"
+    searchString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/txtRSTXT-TXLINE[2," & count & "]"
     ParaString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/ctxtRSTXT-TXPARGRAPH[0," & count & "]"
-    ParaVar = session.findById(ParaString).Text
-    longText = session.findById(SearchString).Text
+    ParaVar = session.findById(ParaString).text
+    longText = session.findById(searchString).text
     
         
     While longText <> "________________________________________________________________________" 'Stop running the loop when we reach the end of the document
@@ -241,10 +241,10 @@ Function ReadLongText(OpNum, View)
                 
         'Get new values
         count = count + 1
-        SearchString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/txtRSTXT-TXLINE[2," & count & "]"
+        searchString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/txtRSTXT-TXLINE[2," & count & "]"
         ParaString = "wnd[0]/usr/tblSAPLSTXXEDITAREA/ctxtRSTXT-TXPARGRAPH[0," & count & "]"
-        ParaVar = session.findById(ParaString).Text
-        longText = session.findById(SearchString).Text
+        ParaVar = session.findById(ParaString).text
+        longText = session.findById(searchString).text
     Wend
     
     session.findById("wnd[0]/tbar[0]/btn[3]").press 'Exit long text
