@@ -13,6 +13,8 @@ class Anchor(object):
         self.min_num = "N/A"
         self.max_num = "N/A"
 
+        self.isEmpty = False
+
     def add_text_snippet(self, lines_text):
         self.lines_text = lines_text
         string_text = "\n".join(self.lines_text)
@@ -29,6 +31,7 @@ class Anchor(object):
         except ValueError:
             self.min_num = "N/A"
             self.max_num = "N/A"
+            self.isEmpty = True
         except TypeError:
             self.min_num = "Type Error"
             self.max_num = "Type Error"

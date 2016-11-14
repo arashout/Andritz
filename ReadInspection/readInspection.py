@@ -4,7 +4,8 @@ import os
 from msOfficeOperations import docC2txt
 from models import Anchor
 
-file_path = os.path.join(os.getcwd(), '50851653.doc')
+file_name = input("Enter a file name:\n")
+file_path = os.path.join(os.getcwd(), file_name)
 txt_file_path = docC2txt(file_path)
 
 # Read txt file
@@ -16,7 +17,7 @@ with open(txt_file_path, 'r') as f:
 i = 0
 snippet = []
 anchors = []  # List of anchor objects
-anchor_pattern = re.compile(r"^([A-Z]\)|\d+\))")
+anchor_pattern = re.compile(r"^([A-Z]{1,2}\)|\d{1,2}\))")
 
 # While loop for finding all anchor positions
 while i < len(content):
@@ -36,18 +37,11 @@ while j < len(anchors) - 1:
     j += 1
 
 # Write CSV file
-important_anchors = "A,B,C,D,E,F,G,H,12,J,K,L,M,N,P,21,R,S,T,U,V,W,X,Y,Z".split(',')
-
 csv_file_path = file_path.rstrip('doc') + 'csv'
 with open(csv_file_path, 'w+') as f:
     f.write("Item, Min, Max\n")
     for anchor in anchors:
-
-        write_anchor = False
-        for important_anchor in important_anchors:
-            if anchor.name[:-1] == important_anchor:
-                write_anchor = True
-        if write_anchor:
+        if not anchor.isEmpty:
             f.write("{0},{1},{2}".format(
                 anchor.name, anchor.min_num, anchor.max_num
             ))
