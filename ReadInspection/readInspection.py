@@ -17,7 +17,7 @@ with open(txt_file_path, 'r') as f:
 i = 0
 snippet = []
 anchors = []  # List of anchor objects
-anchor_pattern = re.compile(r"^([A-Z]{1,2}\)|\d{1,2}\))")
+anchor_pattern = re.compile(r"^([A-Z]{1,2}\)|\d{1,2}\)|\d{1,2}[a-z]\))")
 
 # While loop for finding all anchor positions
 while i < len(content):
