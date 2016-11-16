@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} cmdWindow 
    Caption         =   "Material Info Command Window"
-   ClientHeight    =   6150
+   ClientHeight    =   4995
    ClientLeft      =   45
    ClientTop       =   330
    ClientWidth     =   4710
@@ -14,7 +14,6 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
- 
 Private Sub UserForm_Initialize()
     With Me
         .Top = Application.Top + 125 '< change 125 to what u want
@@ -36,7 +35,27 @@ Private Sub UserForm_Initialize()
     End With
      
 End Sub
-
+Private Sub opAllStock_Click()
+    Dim itemsToChange() As String
+    Dim val As String
+    Dim i As Integer
+    itemsToChange = Split("Stock,Safety Stock,Project Stock,Order Reservation,Product Order,Purchase Requisition,Purchase Order Item,Dependant Requisition,Planned Order", ",")
+    If Me.opAllStock.value Then
+        For i = 0 To cmdWindow.listboxOptions.ListCount - 1
+            val = cmdWindow.listboxOptions.List(i)
+            If HelpFunctions.inArr(itemsToChange, val) Then
+                cmdWindow.listboxOptions.Selected(i) = True
+            End If
+        Next i
+    Else
+        For i = 0 To cmdWindow.listboxOptions.ListCount - 1
+            val = cmdWindow.listboxOptions.List(i)
+            If HelpFunctions.inArr(itemsToChange, val) Then
+                cmdWindow.listboxOptions.Selected(i) = False
+            End If
+        Next i
+    End If
+End Sub
 Private Sub btnExecute_Click()
     Dim i As Integer
     Dim key As String
