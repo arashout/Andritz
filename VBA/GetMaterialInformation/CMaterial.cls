@@ -13,36 +13,35 @@ Option Explicit
 ''''''''''''''''''''''
 
 'Info about material
-Public matNum As String
-Public plant As String
-Public desc As String
+Private matNum As String
+Private plant As String
+Private desc As String
+
+'Moving Price Information
+Private movingPrice As String
+Private movingQuantity As String
+
+'Most Recent Purchase Information
+Private recentPrice As String
+Private recentCurrency As String
+Private recentQuantity As String
+Private recentUnit As String
+
+'MRP info
+Private stock As Long
+Private safetyStock As Long
+Private projectStock As Long
+Private orderReservation As Long
+Private productOrder As Long
+Private purchaseReq As Long
+Private POItem As Long
+Private dependantReq As Long
+Private plannedOrder As Long
 
 'Validation Properties
 Public isValidSAPNum As Boolean
 Public hasError As Boolean
-
-'Moving Price Information
-Public movingPrice As String
-Public movingQuantity As String
-
-'Most Recent Purchase Information
-Public recentPrice As String
-Public recentCurrency As String
-Public recentQuantity As String
-Public recentUnit As String
-
 Public foundRecentPrice As Boolean 'Whether price information was found or not
-
-'MRP info
-Public stock As Long
-Public safetyStock As Long
-Public projectStock As Long
-Public orderReservation As Long
-Public productOrder As Long
-Public purchaseReq As Long
-Public POItem As Long
-Public dependantReq As Long
-Public plannedOrder As Long
 
 'SAP session
 Public session As Variant
@@ -51,6 +50,9 @@ Public session As Variant
 Public rowIndex As Long
 Public colIndex As Long
 
+'Collection that holds information for initiliazing option list and outputting
+'Note: Could have used a dictionary here but order was important
+Public collectionInfo As Collection
 ''''''''''''''''''''''
 ' Pretend Constructor
 ''''''''''''''''''''''
@@ -64,7 +66,9 @@ Sub initCMaterial(sapNum As String, currentSession As Variant, rowI As Long, col
         plant = plantNum
     Else
         isValidSAPNum = False
+        Exit Sub
     End If
+    Call createCollectionEntries
 End Sub
 
 ''''''''''''''''''''''
@@ -75,6 +79,7 @@ Public Sub navigateZmatinfo()
     hasError = False
     
     session.SendCommand ("/nzmatinfo")
+    'Turn off all unnecessary information so SAP loads faster
     session.findById("wnd[0]/usr/chkX_MOVE").Selected = False
     session.findById("wnd[0]/usr/chkX_SALES").Selected = False
     session.findById("wnd[0]/usr/chkX_BOM").Selected = False
@@ -82,9 +87,10 @@ Public Sub navigateZmatinfo()
     session.findById("wnd[0]/usr/chkX_PURCH").Selected = True
     session.findById("wnd[0]/usr/chkP_DEF").Selected = True
     
+    'Enter the plant and material number
     session.findById("wnd[0]/usr/ctxtP_WERKS").text = plant
     session.findById("wnd[0]/usr/ctxtSO_MATNR-LOW").text = matNum
-    session.findById("wnd[0]").sendVKey 8
+    session.findById("wnd[0]").sendVKey 8 'Execute
     
     'If it hasn't made it to the material info page there is a problem
     On Error GoTo wrongSAPNum
@@ -100,35 +106,55 @@ wrongSAPNum:
     
 End Sub
 ''''''''''''''''''''''
-'Output Modes
-''''''''''''''''''''''
-Public Sub outputAllStockInfo()
-    Cells(rowIndex, colIndex + 1).Value = movingPrice
-    Cells(rowIndex, colIndex + 2).Value = stock
-    Cells(rowIndex, colIndex + 3).Value = projectStock
-    Cells(rowIndex, colIndex + 4).Value = safetyStock
-    Cells(rowIndex, colIndex + 5).Value = orderReservation
-    Cells(rowIndex, colIndex + 6).Value = dependantReq
-    Cells(rowIndex, colIndex + 7).Value = productOrder
-    Cells(rowIndex, colIndex + 8).Value = POItem
-    Cells(rowIndex, colIndex + 9).Value = plannedOrder
-End Sub
-Public Sub outputMovingPriceAndStock()
-    Cells(rowIndex, colIndex + 1).Value = movingPrice
-    Cells(rowIndex, colIndex + 2).Value = stock
-End Sub
-Public Sub outputRecentPrice()
-    Cells(rowIndex, colIndex + 1).Value = recentPrice
-    Cells(rowIndex, colIndex + 2).Value = recentQuantity & " " & recentUnit
-    Cells(rowIndex, colIndex + 3).Value = recentCurrency
-    Cells(rowIndex, colIndex + 4).Value = plant
-End Sub
-Public Sub outputDescription()
-    Cells(rowIndex, colIndex + 1).Value = desc
-End Sub
-''''''''''''''''''''''
 ' Private Methods
 ''''''''''''''''''''''
+Private Sub createCollectionEntries()
+    Set collectionInfo = New Collection
+    'Set-up collection so cmd window can be populated
+    
+    With collectionInfo
+        'Unfortunately you have to add new items manually here
+        'This collection item will be used to update command window listbox
+        'Also note that I had to add an array because you can't iterate over keys in collection
+        .Add Array(plant, "Plant Code"), "Plant Code"
+        .Add Array(desc, "Description"), "Description"
+        .Add Array(recentPrice, "Recent Price"), "Recent Price"
+        .Add Array(recentCurrency, "Recent Price Currency"), "Recent Price Currency"
+        .Add Array(recentQuantity, "Recent Price Quantity"), "Recent Price Quantity"
+        .Add Array(recentUnit, "Recent Price Units"), "Recent Price Units"
+        .Add Array(movingPrice, "Moving Price"), "Moving Price"
+        .Add Array(movingQuantity, "Moving Price Quantity"), "Moving Price Quantity"
+        .Add Array(stock, "Stock"), "Stock"
+        .Add Array(safetyStock, "Safety Stock"), "Safety Stock"
+        .Add Array(projectStock, "Project Stock"), "Project Stock"
+        .Add Array(orderReservation, "Order Reservation"), "Order Reservation"
+        .Add Array(productOrder, "Product Order"), "Product Order"
+        .Add Array(purchaseReq, "Purchase Requisition"), "Purchase Requisition"
+        .Add Array(POItem, "Purchase Order Item"), "Purchase Order Item"
+        .Add Array(dependantReq, "Dependant Requisition"), "Dependant Requisition"
+        .Add Array(plannedOrder, "Planned Order"), "Planned Order"
+    End With
+
+End Sub
+Private Sub updateCollectionEntries()
+    Call HelpFunctions.updateCollectionVal(Array(plant, "Plant Code"), "Plant Code", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(desc, "Description"), "Description", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(recentPrice, "Recent Price"), "Recent Price", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(recentCurrency, "Recent Price Currency"), "Recent Price Currency", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(recentQuantity, "Recent Price Quantity"), "Recent Price Quantity", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(recentUnit, "Recent Price Units"), "Recent Price Units", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(movingPrice, "Moving Price"), "Moving Price", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(movingQuantity, "Moving Price Quantity"), "Moving Price Quantity", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(stock, "Stock"), "Stock", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(safetyStock, "Safety Stock"), "Safety Stock", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(projectStock, "Project Stock"), "Project Stock", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(orderReservation, "Order Reservation"), "Order Reservation", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(productOrder, "Product Order"), "Product Order", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(purchaseReq, "Purchase Requisition"), "Purchase Requisition", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(POItem, "Purchase Order Item"), "Purchase Order Item", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(dependantReq, "Dependant Requisition"), "Dependant Requisition", collectionInfo)
+    Call HelpFunctions.updateCollectionVal(Array(plannedOrder, "Planned Order"), "Planned Order", collectionInfo)
+End Sub
 'This sub-routine assumes that the session is currently on "Material Info" page
 Private Sub ReadMaterialInfo()
     Dim currentTitle As String
@@ -154,6 +180,8 @@ Private Sub ReadMaterialInfo()
         Call collectPriceInfo
     End If
     
+    Call updateCollectionEntries
+    
     Exit Sub
     
 noID:
@@ -161,6 +189,9 @@ noID:
     Resume Next
     
 End Sub
+'''''''''''''''''''''''''''''''
+'Information Collection Subs - These subs collect information from the material info page and update the collection object
+'''''''''''''''''''''''''''''''
 Private Sub CollectFixed()
         movingPrice = session.findById("wnd[0]/usr/lbl[19,16]").text 'Moving price location
         movingQuantity = session.findById("wnd[0]/usr/lbl[45,15]").text 'Moving price quantity
@@ -232,7 +263,7 @@ Private Sub collectPriceInfo()
     'Get price information from sheet if they exist - otherwise error will ensure they are blank
     
     If i <> maxI Then 'If MaxI has been reached means price for sure not found
-        recentPrice = session.findById("wnd[0]/usr/lbl[19," & i & "]").text
+        recentPrice = Trim(session.findById("wnd[0]/usr/lbl[19," & i & "]").text)
         recentCurrency = session.findById("wnd[0]/usr/lbl[44," & i & "]").text
         recentQuantity = session.findById("wnd[0]/usr/lbl[50," & i & "]").text
         recentUnit = session.findById("wnd[0]/usr/lbl[53," & i & "]").text

@@ -1,9 +1,10 @@
 Attribute VB_Name = "MaterialInfoRunScripts"
+Option Explicit
 Public Sub showCMD()
-    Call cmdWindow.Show(vbvModeless) 'So you can select outside
+    Call cmdWindow.Show(vbModeless) 'So you can select outside
 End Sub
 'This run script looks for materials defined in 1105
-Sub DSConlyRun()
+Sub DSConlyRun(outputKeys As Collection)
     'Get the range the user has selected to determine the first and last cell to iterate between
     Dim myRange As Range
     Set myRange = Selection
@@ -13,10 +14,6 @@ Sub DSConlyRun()
     
     Dim j, k As Long 'Row and Column index where to look for SAP numbers
     k = myRange.Column 'First column of selection
-    
-    'Get settings from command window
-    Dim statusListbox As String
-    statusListbox = cmdWindow.listboxOptions.Value
     
     'Connect to SAP
     Dim session As Variant
@@ -33,25 +30,23 @@ Sub DSConlyRun()
             End If
             
             If Not curMat.hasError Then 'If we manage to get to the material info page
-                'Chose correct output depending on cmd settings
-                Select Case statusListbox
-                    Case "Get Long Text"
-                        Call curMat.outputDescription
-                    Case "Get Moving Price/Stock/Safety Stock"
-                        Call curMat.outputMovingPriceAndStock
-                    Case "Get ALL Stock Info"
-                        Call curMat.outputAllStockInfo
-                    Case Else
-                        MsgBox ("You need to pick an option from the listbox")
-                        Exit Sub
-                End Select
+                Call outputValues(curMat, outputKeys)
             End If
         End If
     Next j
     
     session.findById("wnd[0]").Close
 End Sub
-
+Sub outputValues(mat As CMaterial, outputKeys As Collection)
+    Dim key As Variant
+    Dim output As Variant
+    Dim colOffset As Integer: colOffset = 1 'This decides which cell to output to
+    For Each key In outputKeys
+        output = mat.collectionInfo.Item(key)
+        Cells(mat.rowIndex, mat.colIndex + colOffset) = output(0)
+        colOffset = colOffset + 1
+    Next key
+End Sub
 'This runner checks in plant 1105 and if not found 0303
 Sub multiplePlantRun()
     'Get the range the user has selected to determine the first and last cell to iterate between

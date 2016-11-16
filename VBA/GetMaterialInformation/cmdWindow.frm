@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} cmdWindow 
    Caption         =   "Material Info Command Window"
-   ClientHeight    =   3225
+   ClientHeight    =   6150
    ClientLeft      =   45
    ClientTop       =   330
    ClientWidth     =   4710
@@ -20,32 +20,42 @@ Private Sub UserForm_Initialize()
         .Top = Application.Top + 125 '< change 125 to what u want
         .Left = Application.Left + 25 '< change 25 to what u want
     End With
+    'I have to do all this because I want to use the the items in the collection to populate the list box
+    Dim tempMat As CMaterial
+    Dim session As Variant
+    Set session = SAPFunctions.connect2SAP
+    Set tempMat = factory.createCMaterial(sapNum:="123456789", currentSession:=session, rowI:=1, colI:=1, plantNum:="1105")
+    Set session = Nothing
+    
+    'Populate the list box with collectionInfo
     With Me.listboxOptions
-        .AddItem "Get Long Text"
-        .AddItem "Get Most Recent Price Info"
-        .AddItem "Get Moving Price/Stock/Safety Stock"
-        .AddItem "Get ALL Stock Info"
+        Dim infoTuple As Variant
+        For Each infoTuple In tempMat.collectionInfo
+            .AddItem (infoTuple(1))
+        Next infoTuple
     End With
      
 End Sub
 
 Private Sub btnExecute_Click()
-    Dim statusListbox As String
-    If Not IsNull(cmdWindow.listboxOptions.Value) Then
-        statusListbox = cmdWindow.listboxOptions.Value
-    Else
+    Dim i As Integer
+    Dim key As String
+    Dim outputCollectionKeys As Collection
+    Set outputCollectionKeys = New Collection
+    
+    'Figure out which items we need to output by adding to keys collection
+    For i = 0 To cmdWindow.listboxOptions.ListCount - 1
+        key = cmdWindow.listboxOptions.List(i)
+        If cmdWindow.listboxOptions.Selected(i) Then
+            outputCollectionKeys.Add (key)
+        End If
+    Next i
+    
+    'Make sure the user selected something
+    If outputCollectionKeys.Count = 0 Then
         MsgBox ("You need to pick an option from the listbox")
         Exit Sub
     End If
     
-    Select Case statusListbox
-        Case "Get Long Text"
-            Call MaterialInfoRunScripts.DSConlyRun
-        Case "Get Most Recent Price Info"
-            Call MaterialInfoRunScripts.multiplePlantRun
-        Case "Get Moving Price/Stock/Safety Stock"
-            Call MaterialInfoRunScripts.DSConlyRun
-        Case "Get ALL Stock Info"
-            Call MaterialInfoRunScripts.DSConlyRun
-    End Select
+    Call MaterialInfoRunScripts.DSConlyRun(outputCollectionKeys)
 End Sub
