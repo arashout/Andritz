@@ -1,5 +1,15 @@
 Attribute VB_Name = "HelpFunctions"
 Option Explicit
+Function repeatString(text As String, repeat As Integer) As String
+    'This function returns string which contains the text parameter repeated a given number of times
+    Dim i As Integer
+    i = 1
+    While i < repeat
+        text = text + text
+        i = 1 + i
+    Wend
+    repeatString = text
+End Function
 Sub updateCollectionVal(aValue As Variant, aKey As Variant, aCol As Collection)
     'A work around sub for editing the values added to collections
     'Collections aren't meant to have there values edited
