@@ -1,10 +1,7 @@
-Attribute VB_Name = "MaterialInfoRunScripts"
+Attribute VB_Name = "MaterialInfoRun"
 Option Explicit
-Public Sub showCMD()
-    Call cmdWindow.Show(vbModeless) 'So you can select outside
-End Sub
 'This run script looks for materials defined in 1105
-Sub DSConlyRun(outputKeys As Collection)
+Sub DSConlyRun(outputKeys As Collection, wantHeaders)
     'Get the range the user has selected to determine the first and last cell to iterate between
     Dim myRange As Range
     Set myRange = Selection
@@ -30,6 +27,9 @@ Sub DSConlyRun(outputKeys As Collection)
             End If
             
             If Not curMat.hasError Then 'If we manage to get to the material info page
+                If wantHeaders Then
+                    Call outputHeaders(k, outputKeys)
+                End If
                 Call outputValues(curMat, outputKeys)
             End If
         End If
@@ -37,7 +37,15 @@ Sub DSConlyRun(outputKeys As Collection)
     
     session.findById("wnd[0]").Close
 End Sub
-Sub outputValues(mat As CMaterial, outputKeys As Collection)
+Private Sub outputHeaders(firstCol As Long, outputKeys As Collection)
+    Dim key As Variant
+    Dim colOffset As Integer: colOffset = 1 'This decides which cell to output to
+    For Each key In outputKeys
+        Cells(1, firstCol + colOffset) = key
+        colOffset = colOffset + 1
+    Next key
+End Sub
+Private Sub outputValues(mat As CMaterial, outputKeys As Collection)
     Dim key As Variant
     Dim output As Variant
     Dim colOffset As Integer: colOffset = 1 'This decides which cell to output to
@@ -61,7 +69,7 @@ Sub multiplePlantRun()
     
     'Get settings from command window
     Dim statusListbox As String
-    statusListbox = cmdWindow.listboxOptions.Value
+    statusListbox = cmdWindow.listboxOptions.value
     
     'Connect to SAP
     Dim session As Variant

@@ -33,13 +33,18 @@ Private Sub UserForm_Initialize()
             .AddItem (infoTuple(1))
         Next infoTuple
     End With
-     
+    
+    'Tool-tips
+    cmdWindow.listboxOptions.ControlTipText = "Select the items you would like to output." & vbCrLf & "NOTE: Use CTRL + Click to select multiple items"
+    cmdWindow.chkAllStock.ControlTipText = "This selects all the stock options + moving price for you"
+    cmdWindow.chkHeaders.ControlTipText = "Outputs the headers of the chosen values on ROW 1 of the sheet" & vbCrLf & "NOTE: THIS WILL OVERWRITE ITEMS AT THE TOP"
+    
 End Sub
-Private Sub opAllStock_Click()
+Private Sub chkAllStock_Click()
     Dim itemsToChange() As String
     Dim val As String
     Dim i As Integer
-    itemsToChange = Split("Stock,Safety Stock,Project Stock,Order Reservation,Product Order,Purchase Requisition,Purchase Order Item,Dependant Requisition,Planned Order", ",")
+    itemsToChange = Split("Moving Price,Stock,Safety Stock,Project Stock,Order Reservation,Product Order,Purchase Requisition,Purchase Order Item,Dependant Requisition,Planned Order", ",")
     If Me.opAllStock.value Then
         For i = 0 To cmdWindow.listboxOptions.ListCount - 1
             val = cmdWindow.listboxOptions.List(i)
@@ -76,5 +81,5 @@ Private Sub btnExecute_Click()
         Exit Sub
     End If
     
-    Call MaterialInfoRunScripts.DSConlyRun(outputCollectionKeys)
+    Call MaterialInfoRun.DSConlyRun(outputCollectionKeys, cmdWindow.chkHeaders.value)
 End Sub
