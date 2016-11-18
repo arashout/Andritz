@@ -38,13 +38,16 @@ Public Sub initCOperation(fopNum As String, fdesc As String, fworkCenter As Stri
     
     'VALIDATE
     Dim validWorkCenters() As String
-    validWorkCenters = Split("139,148,153,218,252,330,333,364,410,420,506,519,601,602,720,801,1013,1108,1207,1901,2004,2005,2006,2007,2008,NCR,999", ",")
+    validWorkCenters = Split("139,148,153,218,252,330,333,364,410,420,506,519,601,602,720,801,1013,1108,1207,1901,2004,2005,2006,2007,2008,NCR", ",")
     
     If IsNumeric(hours) And HelpFunctions.inArr(validWorkCenters, workCenter) Then
         isValidOperation = True
     'Possible scenarios
+    ElseIf workCenter = "999" Then
+        hours = "0"
+        isValidOperation = True
     ElseIf workCenter = "NCR" Then
-        hours = 0
+        hours = "0"
         isValidOperation = True
     ElseIf workCenter = "SUB" Then
         hasError = True
@@ -66,16 +69,16 @@ End Sub
 '''''''''''''''''''''
 Public Sub enterOperation(j As Integer)
     If opNum <> "" Then 'Enter an operation if specified
-        session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/txtPLPOD-VORNR[0," & j & "]").Text = opNum
+        session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/txtPLPOD-VORNR[0," & j & "]").text = opNum
     End If
     
     If workCenter = "999" Then
-        session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/ctxtPLPOD-STEUS[4," & j & "]").Text = "ZP08"
+        session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/ctxtPLPOD-STEUS[4," & j & "]").text = "ZP08"
     End If
     
     'Enter rest of information
-    session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/ctxtPLPOD-ARBPL[2," & j & "]").Text = workCenter 'Work Center
-    session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/txtPLPOD-VGW02[19," & j & "]").Text = hours 'Hours
+    session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/ctxtPLPOD-ARBPL[2," & j & "]").text = workCenter 'Work Center
+    session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/txtPLPOD-VGW02[19," & j & "]").text = hours 'Hours
     
     If Len(desc) > shortTextLimit Then
         'Press on long text checkbox
@@ -88,7 +91,7 @@ Public Sub enterOperation(j As Integer)
         End If
         
     Else
-        session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/txtPLPOD-LTXA1[6," & j & "]").Text = desc
+        session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/txtPLPOD-LTXA1[6," & j & "]").text = desc
     End If
     
 End Sub
@@ -99,9 +102,9 @@ Private Sub enterLongText()
     Dim i As Integer
     For i = LBound(arrDesc) To UBound(arrDesc)
         'looping through array here
-        session.findById("wnd[0]/usr/tblSAPLSTXXEDITAREA/txtRSTXT-TXLINE[2," & i + 1 & "]").Text = arrDesc(i)
+        session.findById("wnd[0]/usr/tblSAPLSTXXEDITAREA/txtRSTXT-TXLINE[2," & i + 1 & "]").text = arrDesc(i)
         If lineFormats(i) = "/" Then 'Line feed
-            session.findById("wnd[0]/usr/tblSAPLSTXXEDITAREA/ctxtRSTXT-TXPARGRAPH[0," & i + 1 & "]").Text = lineFormats(i)
+            session.findById("wnd[0]/usr/tblSAPLSTXXEDITAREA/ctxtRSTXT-TXPARGRAPH[0," & i + 1 & "]").text = lineFormats(i)
         End If
         session.findById("wnd[0]/usr/tblSAPLSTXXEDITAREA/txtRSTXT-TXLINE[2," & i + 1 & "]").caretPosition = 72
         session.findById("wnd[0]").sendVKey 0
@@ -137,12 +140,18 @@ Private Sub splitDescription()
         If Len(currentLine) > longTextLineLimit Then
             arrDesc(UBound(arrDesc)) = currentLine
             ReDim Preserve arrDesc(0 To UBound(arrDesc) + 1) As String
+            
+            ReDim Preserve lineFormats(0 To UBound(lineFormats) + 1) As String
+            lineFormats(UBound(lineFormats)) = "*"
+            
             currentLine = ""
         End If
     Next i
     'Whatever is left, put in array
     arrDesc(UBound(arrDesc)) = currentLine
     
+    'Get rid of unnessary first values
+    lineFormats = HelpFunctions.removeFirstElement(lineFormats)
     arrDesc = HelpFunctions.removeFirstElement(arrDesc)
     
 End Sub

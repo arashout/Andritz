@@ -15,6 +15,23 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
+Private Sub helpBtn_Click()
+    Dim purpose, requirements As String
+    purpose = HelpFunctions.repeatString("-", 5) & "Purpose" & HelpFunctions.repeatString("-", 5) & vbCrLf & _
+    "The aim of this macro is to stream-line the process of entering operations in CA02." & vbCrLf & _
+    "It does this by copying operation information (Operation Numbers, Work Centers, Hours and Long Text) into SAP from Excel for you." & vbCrLf
+    
+    requirements = HelpFunctions.repeatString("-", 5) & "Requirements" & HelpFunctions.repeatString("-", 5) & vbCrLf & _
+    "In your EXCEL Sheet" & vbCrLf & _
+    "The macro can only handle 1 Operation per row MAXIMUM" & vbCrLf & _
+    "The operation number, operation description, work center, operations hours MUST be in seperate columns" & vbCrLf & _
+    "In SAP" & vbCrLf & _
+    "Ensure that the alternative editor is enabled (Talk to the developer for more information)" & vbCrLf
+    
+    
+    MsgBox purpose & requirements, vbInformation + vbOKOnly, "Set Routing Help"
+End Sub
+
 Private Sub UserForm_Initialize()
     With Me
         .Top = Application.Top + 125 '< change 125 to what u want
@@ -24,7 +41,13 @@ Private Sub UserForm_Initialize()
         .AddItem "CA02 - Routing"
         .AddItem "C002 - PO Routing (Not Implemented)"
     End With
-    listboxOptions.Selected(1) = True 'Mark Routing as selected to start with
+    listboxOptions.Selected(0) = True 'Mark CA02 as selected to start with
+    
+    'Initiliaze Control Tip Text
+    Me.OpNumLabel.ControlTipText = "OPTIONAL: Enter the column number that contains your operation numbers"
+    Me.DescLabel.ControlTipText = "REQUIRED: Enter the column number that contains operation descriptions"
+    Me.WorkCtrLabel.ControlTipText = "REQUIRED: Enter the column number that contains work centers"
+    Me.HoursLabel.ControlTipText = "REQUIRED: Enter the column number that contains operation hours"
 End Sub
 
 Private Sub btnExecute_Click()
@@ -37,8 +60,21 @@ Private Sub btnExecute_Click()
         Exit Sub
     End If
     
+    If Not validInputs Then
+        MsgBox ("You need to specify the numbers of the columns that store your information")
+        Exit Sub
+    End If
+    
     Select Case statusListbox
         Case "CA02 - Routing"
-            Call CA02.runscript
+            Call RoutingRun.runscript
     End Select
 End Sub
+
+Private Function validInputs() As Boolean
+    If Not IsNumeric(cmdWindow.tbDesc.Value) And Not IsNumeric(cmdWindow.tbDesc.Value) And Not IsNumeric(cmdWindow.tbDesc.Value) Then
+        validInputs = False
+        Exit Function
+    End If
+    validInputs = True
+End Function

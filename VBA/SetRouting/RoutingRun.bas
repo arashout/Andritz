@@ -1,4 +1,4 @@
-Attribute VB_Name = "CA02"
+Attribute VB_Name = "RoutingRun"
 Option Explicit
 Public Type sapWindow
     scrollBarPos As Long
@@ -15,14 +15,6 @@ Sub runscript()
     Dim opCol As Long
     Dim errorCol As Long
     Dim useOpNums As Boolean
-    Dim logError As Boolean
-    
-    If IsNumeric(cmdWindow.tbError) Then
-        errorCol = CInt(cmdWindow.tbError)
-        logError = True
-    Else
-        logError = False
-    End If
     
     If IsNumeric(cmdWindow.tbOpNum) Then
         opCol = CInt(cmdWindow.tbOpNum)
@@ -66,7 +58,7 @@ Sub runscript()
             'Deal with possible errors
             wnd.currentIndex = wnd.currentIndex + 1
         ElseIf curOP.hasError Then
-            Cells(i, ctrCol).Interior.ColorIndex = 44
+            Rows(i).Interior.ColorIndex = 44
         End If
     Next i
     
@@ -92,7 +84,7 @@ Sub scrollToBlank(session As Variant, wnd As sapWindow)
             wnd.currentIndex = 0 'Reset index variable
         End If
         
-        workCtr = session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/ctxtPLPOD-ARBPL[2," & wnd.currentIndex & "]").Text
+        workCtr = session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/ctxtPLPOD-ARBPL[2," & wnd.currentIndex & "]").text
         
         If workCtr = "" Then 'Break out once we hit first blank
             Exit Do

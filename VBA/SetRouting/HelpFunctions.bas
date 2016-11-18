@@ -1,4 +1,14 @@
 Attribute VB_Name = "HelpFunctions"
+Function repeatString(text As String, repeat As Integer) As String
+    'This function returns string which contains the text parameter repeated a given number of times
+    Dim i As Integer
+    i = 1
+    While i < repeat
+        text = text + text
+        i = 1 + i
+    Wend
+    repeatString = text
+End Function
 Function removeFirstElement(ByVal arr As Variant) As Variant
     For i = LBound(arr) + 1 To UBound(arr)
       arr(i - 1) = arr(i)
