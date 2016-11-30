@@ -32,8 +32,10 @@ Function removeFirstElement(ByVal arr As Variant) As Variant
 End Function
 
 Function lastRow() As Long
-    'Returns the lastRow used in the sheet
-    lastRow = Range("A1").SpecialCells(xlCellTypeLastCell).Row
+	'Returns the last used row in the sheet
+    Set sht = Application.ActiveSheet
+    sht.UsedRange 'Refresh UsedRange
+    lastRow = sht.UsedRange.Rows(sht.UsedRange.Rows.Count).Row
 End Function
 
 Function lastCol() As Long

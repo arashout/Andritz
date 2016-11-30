@@ -2,11 +2,12 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "COperation"
+Attribute VB_Name = "COperationPO"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'NOTE: VBA doesn't support inheritance so instead I will use interfaces
 Option Explicit
 '''''''''''''''
 'Properties
@@ -67,36 +68,47 @@ End Sub
 'Public Methods
 '''''''''''''''''''''
 Public Sub enterOperation(j As Integer)
-    If opNum <> "" Then 'Enter an operation if specified
-        session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/txtPLPOD-VORNR[0," & j & "]").text = opNum
-    End If
+    'Enter an operation
+    session.findById("wnd[0]/usr/tblSAPLCOVGTCTRL_0100/txtAFVGD-VORNR[0," & j & "]").text = opNum
     
     If workCenter = "999" Then
-        session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/ctxtPLPOD-STEUS[4," & j & "]").text = "ZP08"
+        session.findById("wnd[0]/usr/tblSAPLCOVGTCTRL_0100/ctxtAFVGD-STEUS[6," & j & "]").text = "ZP08"
     End If
     
-    'Enter rest of information
-    session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/ctxtPLPOD-ARBPL[2," & j & "]").text = workCenter 'Work Center
-    session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/txtPLPOD-VGW02[19," & j & "]").text = hours 'Hours
-    
+    session.findById("wnd[0]/usr/tblSAPLCOVGTCTRL_0100/ctxtAFVGD-ARBPL[4," & j & "]").text = workCenter 'Work Center
+        
     If Len(desc) > shortTextLimit Then
+        Call enterHours
         'Press on long text checkbox
-        session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/chkRC270-TXTKZ[7," & j & "]").SetFocus
+        session.findById("wnd[0]/usr/tblSAPLCOVGTCTRL_0100/chkRC270-TXTKZ[9," & j & "]").SetFocus
         session.findById("wnd[0]").sendVKey 2
         Call enterLongText
-        'Check if the stupid 'Do you want to edit next long text' pops up
+        'Check if the stupid 'Do you want to edit next long text' pops up and exit it
         If session.Children().Count = 2 Then
             session.findById("wnd[1]").sendVKey 12
         End If
         
     Else
-        session.findById("wnd[0]/usr/tblSAPLCPDITCTRL_1400/txtPLPOD-LTXA1[6," & j & "]").text = desc
+        
+        session.findById("wnd[0]/usr/tblSAPLCOVGTCTRL_0100/txtAFVGD-LTXA1[8," & j & "]").text = desc
+        session.findById("wnd[0]").sendVKey 0 'Enter into operation
+        Call enterHours
     End If
     
 End Sub
 '''''''''''''''''''''
 'Private Methods
 '''''''''''''''''''''
+Private Sub enterHours()
+    session.findById("wnd[0]").sendVKey 0 'Reach the standard hours screen
+    session.findById("wnd[0]/usr/subTAB_SUB_SCREEN:SAPLCOVF:0101/tabsTABSTRIP_0100/tabpVOGW/ssubSUBSCR_0101:SAPLCOVF:0130/txtAFVGD-VGW02").text = hours
+    session.findById("wnd[0]/usr/subTAB_SUB_SCREEN:SAPLCOVF:0101/tabsTABSTRIP_0100/tabpVOGW/ssubSUBSCR_0101:SAPLCOVF:0130/ctxtAFVGD-VGE02").text = "HUR"
+    session.findById("wnd[0]").sendVKey 0
+    session.findById("wnd[0]").sendVKey 0
+    session.findById("wnd[0]").sendVKey 0
+    session.findById("wnd[0]").sendVKey 0
+    session.findById("wnd[0]").sendVKey 0 'Finish will get us back to 'Production Order Change'
+End Sub
 Private Sub enterLongText()
     Dim i As Integer
     For i = LBound(arrDesc) To UBound(arrDesc)
@@ -152,6 +164,8 @@ Private Sub splitDescription()
     'Get rid of unnessary first values
     lineFormats = HelpFunctions.removeFirstElement(lineFormats)
     arrDesc = HelpFunctions.removeFirstElement(arrDesc)
+    
 End Sub
+
 
 

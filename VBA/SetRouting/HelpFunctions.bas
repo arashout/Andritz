@@ -1,6 +1,5 @@
 Attribute VB_Name = "HelpFunctions"
 Function repeatString(text As String, repeat As Integer) As String
-    'This function returns string which contains the text parameter repeated a given number of times
     Dim i As Integer
     i = 1
     While i < repeat

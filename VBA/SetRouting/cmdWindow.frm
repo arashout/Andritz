@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} cmdWindow 
    Caption         =   "Set Routing Command Window"
-   ClientHeight    =   3225
+   ClientHeight    =   3360
    ClientLeft      =   45
    ClientTop       =   330
    ClientWidth     =   4710
@@ -38,18 +38,20 @@ Private Sub UserForm_Initialize()
         .Left = Application.Left + 25 '< change 25 to what u want
     End With
     With Me.listboxOptions
-        .AddItem "CA02 - Routing"
-        .AddItem "C002 - PO Routing (Not Implemented)"
+        .AddItem "CA02 - Enter Operations"
+        .AddItem "C002 - Enter Operations"
     End With
     listboxOptions.Selected(0) = True 'Mark CA02 as selected to start with
     
     'Initiliaze Control Tip Text
-    Me.OpNumLabel.ControlTipText = "OPTIONAL: Enter the column number that contains your operation numbers"
+    Me.OpNumLabel.ControlTipText = "REQUIRED: Enter the column number that contains your operation numbers"
     Me.DescLabel.ControlTipText = "REQUIRED: Enter the column number that contains operation descriptions"
     Me.WorkCtrLabel.ControlTipText = "REQUIRED: Enter the column number that contains work centers"
     Me.HoursLabel.ControlTipText = "REQUIRED: Enter the column number that contains operation hours"
 End Sub
-
+Private Sub labelLink_Click()
+    ActiveWorkbook.FollowHyperlink Address:="https://www.linkedin.com/in/arashout", NewWindow:=True
+End Sub
 Private Sub btnExecute_Click()
     Dim statusListbox As String
     'Validate user input
@@ -65,14 +67,13 @@ Private Sub btnExecute_Click()
         Exit Sub
     End If
     
-    Select Case statusListbox
-        Case "CA02 - Routing"
-            Call RoutingRun.runscript
-    End Select
+    Call RoutingRun.EnterOperations(CInt(cmdWindow.tbDesc.Value), CInt(cmdWindow.tbWorkCtr.Value), _
+        CInt(cmdWindow.tbHours.Value), CInt(cmdWindow.tbOpNum.Value), _
+        cmdWindow.listboxOptions.ListIndex)
 End Sub
 
 Private Function validInputs() As Boolean
-    If Not IsNumeric(cmdWindow.tbDesc.Value) And Not IsNumeric(cmdWindow.tbDesc.Value) And Not IsNumeric(cmdWindow.tbDesc.Value) Then
+    If Not Not IsNumeric(cmdWindow.tbDesc.Value) And Not IsNumeric(cmdWindow.tbDesc.Value) And Not IsNumeric(cmdWindow.tbOpNum.Value) Then
         validInputs = False
         Exit Function
     End If
