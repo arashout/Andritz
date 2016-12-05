@@ -1,5 +1,10 @@
 Attribute VB_Name = "HelpFunctions"
 Option Explicit
+Function returnNewSheet() As Worksheet
+    With ThisWorkbook
+        Set CreateNewSheet = .Sheets.Add(After:=.Sheets(.Sheets.Count))
+    End With
+End Function
 Function repeatString(text As String, repeat As Integer) As String
     'This function returns string which contains the text parameter repeated a given number of times
     Dim i As Integer
@@ -32,7 +37,7 @@ Function removeFirstElement(ByVal arr As Variant) As Variant
 End Function
 
 Function lastRow() As Long
-	'Returns the last used row in the sheet
+        'Returns the last used row in the sheet
     Set sht = Application.ActiveSheet
     sht.UsedRange 'Refresh UsedRange
     lastRow = sht.UsedRange.Rows(sht.UsedRange.Rows.Count).Row

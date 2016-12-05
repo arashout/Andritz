@@ -1,4 +1,13 @@
 Attribute VB_Name = "SAPFunctions"
+'SAP Window struct
+Public Type sapWindow
+    scrollBarId As String
+    scrollBarPos As Long
+    entriesPerPage As Integer
+    
+    currentIndex As Integer
+End Type
+
 Function connect2SAPNew()
     On Error GoTo Pull_Error_General
     
@@ -32,8 +41,7 @@ Pull_Error_General:
     
     End
 End Function
-
-    
+  
 Function connect2SAP()
     On Error GoTo Pull_Error_General
     
