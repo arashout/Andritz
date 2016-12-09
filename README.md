@@ -1,14 +1,11 @@
 # Andritz
-##Paste73CharsPerLine.ahk
-SAP GUI has an alternative word editor that is much faster and simpler than the "word" like one that is the default.
-When opening entries with "Long Text" it is orders of magnitude faster to use this alternative. The downside is that
-you are only allowed to enter 73 characters per line.
-I created this small autohotkey script to make copy and pasting strings longer than 73 characters into SAP painless and
-fast.
-##SAPquickLookup
-If you need to look-up a material number, this script saves you a couple of clicks.
-Later on I will expand it out to other operations
-It basically uses a autohotkey in conjuction with VBS script to achieve this (Passing a parameter materialNum through the command line)
+This is the top level directory of things I have developed at Andritz
+##AHK
+Autohotkey scripts - ranging from simple utilities to an ATTEMPT at automating pulling drawings from Matrix (A GUI hosted on internet explorer)
+##ReadInspection
+Sometimes we were required to transfer measurements from inspection reports written in word into Excel for the PM for easy viewing. I created a WORD parser to look for measurements and save them to csv, which saved around 30 minutes each time we had to do this
 ##VBA
-This is the folder where I keep all the VBA modules I developed at Andritz.
-Most of them automate processes that users used to do manually -> Moving entries from Excel into SAP or vice versa
+Where I keep all the VBA modules I developed at Andritz.
+Most of them automate processes that users used to do manually, usually very repetitive that users avoided them if they could. 
+One in particular was so well recieved that people in Pell City, Alaboma are currently using it as well
+List of utitilies so far:
