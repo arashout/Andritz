@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} cmdWindow 
    Caption         =   "Material Info Command Window"
-   ClientHeight    =   4995
+   ClientHeight    =   5415
    ClientLeft      =   45
    ClientTop       =   330
    ClientWidth     =   4710
@@ -14,6 +14,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
+
 Private Sub UserForm_Initialize()
     With Me
         .Top = Application.Top + 125 '< change 125 to what u want
@@ -34,18 +35,29 @@ Private Sub UserForm_Initialize()
         Next infoTuple
     End With
     
+    'Populate the combo box with list of plants
+    With Me.cmbPlant
+        .AddItem "1105"
+        .AddItem "0303"
+    End With
+    Me.cmbPlant.value = Me.cmbPlant.List(0) 'Make 1105 the default
+    
     'Tool-tips
     cmdWindow.listboxOptions.ControlTipText = "Select the items you would like to output." & vbCrLf & "NOTE: Use CTRL + Click to select multiple items"
     cmdWindow.chkAllStock.ControlTipText = "This selects all the stock options + moving price for you"
-    cmdWindow.chkHeaders.ControlTipText = "Outputs the headers of the chosen values on ROW 1 of the sheet" & vbCrLf & "NOTE: THIS WILL OVERWRITE ITEMS AT THE TOP"
+    cmdWindow.chkHeaders.ControlTipText = "Inserts a row right above the first SAP number with the chosen headers"
+    cmdWindow.cmbPlant.ControlTipText = "Choose the plant that you want ZMATINFO information from"
     
+End Sub
+Private Sub labelLink_Click()
+    ActiveWorkbook.FollowHyperlink Address:="https://www.linkedin.com/in/arashout", NewWindow:=True
 End Sub
 Private Sub chkAllStock_Click()
     Dim itemsToChange() As String
     Dim val As String
     Dim i As Integer
     itemsToChange = Split("Moving Price,Stock,Safety Stock,Project Stock,Order Reservation,Product Order,Purchase Requisition,Purchase Order Item,Dependant Requisition,Planned Order", ",")
-    If Me.opAllStock.value Then
+    If Me.chkAllStock.value Then
         For i = 0 To cmdWindow.listboxOptions.ListCount - 1
             val = cmdWindow.listboxOptions.List(i)
             If HelpFunctions.inArr(itemsToChange, val) Then
@@ -81,5 +93,9 @@ Private Sub btnExecute_Click()
         Exit Sub
     End If
     
-    Call MaterialInfoRun.DSConlyRun(outputCollectionKeys, cmdWindow.chkHeaders.value)
+    'Get the range the user has selected to determine the first and last cell to iterate between
+    Dim sel As Range
+    Set sel = Selection
+    
+    Call MaterialInfoRun.RunCollectMatInfo(sel, cmdWindow.cmbPlant.value, outputCollectionKeys, cmdWindow.chkHeaders.value)
 End Sub
