@@ -39,11 +39,11 @@ while j < len(anchors) - 1:
 # Write CSV file
 csv_file_path = file_path.rstrip('doc') + 'csv'
 with open(csv_file_path, 'w+') as f:
-    f.write("Item, Min, Max\n")
+    f.write("Item,Description,Min,Max\n")
     for anchor in anchors:
         if not anchor.isEmpty:
             f.write("{0},{1},{2}".format(
-                anchor.name, anchor.min_num, anchor.max_num
+                anchor.name, anchor.desc, anchor.min_num, anchor.max_num
             ))
 
             try:

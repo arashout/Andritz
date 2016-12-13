@@ -4,10 +4,11 @@ from fractions import Fraction
 class Anchor(object):
     pattern_decimal = re.compile(r"(\d+\.\d+)")
     pattern_fraction2 = re.compile(r"(?<![\/\d])(\d+)\/(\d+)(?![\/\d])") #From this http://stackoverflow.com/questions/1912376/regular-expression-to-match-fractions-and-not-dates
-    pattern_fraction = re.compile(r"(\d*\s\d+/\d+)")
+    pattern_fraction = re.compile(r"(\d*[\s-]\d+/\d+)")
 
     def __init__(self, name, line_index):
         self.name = name
+        self.desc = ""
         self.line_index = line_index
 
         self.min_num = "N/A"
@@ -15,7 +16,16 @@ class Anchor(object):
 
         self.isEmpty = False
 
+    def update_desc(self, text):
+        desc_pattern = re.compile("^(.+?)[:=]")
+        found_list = re.findall(desc_pattern,text)
+        if len(found_list) == 0:
+            self.desc = ""
+        else:
+            self.desc = found_list[0] #Get rid of list brackets when outputting
+
     def add_text_snippet(self, lines_text):
+
         self.lines_text = lines_text
         string_text = "\n".join(self.lines_text)
 
@@ -24,6 +34,7 @@ class Anchor(object):
 
         fractions = re.findall(self.pattern_fraction, string_text)
         for fraction in fractions:
+            fraction = fraction.replace('-',' ')
             self.list_nums.append(float(sum(Fraction(s) for s in fraction.split()))) #From this http://stackoverflow.com/questions/1806278/convert-fraction-to-float
         try:
             self.min_num = min(self.list_nums)
@@ -35,3 +46,7 @@ class Anchor(object):
         except TypeError:
             self.min_num = "Type Error"
             self.max_num = "Type Error"
+
+        self.update_desc(lines_text[0])
+
+
